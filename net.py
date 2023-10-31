@@ -52,7 +52,7 @@ class encoder_decoder:
 class CJNet(nn.Module):
 
     def __init__(self, encoder, frontend=None):
-        super(AdaIN_net, self).__init__()
+        super(CJNet, self).__init__()
         self.encoder = encoder
         self.frontend = frontend
 
@@ -77,11 +77,10 @@ class CJNet(nn.Module):
         frontend_list = list(self.frontend.children())
         self.front_end_stages = nn.Sequential(*frontend_list)
 
-        self.mse_loss = nn.MSELoss()
-
     def init_decoder_weights(self, mean, std):
         for param in self.frontend.parameters():
             nn.init.normal_(param, mean=mean, std=std)
+
     def encode(self, X):
         relu1_1 = self.encoder_stage_1(X)
         relu2_1 = self.encoder_stage_2(relu1_1)
@@ -91,16 +90,8 @@ class CJNet(nn.Module):
     
     def decode(self, X):
         return self.front_end_stages(X)
-
-    #   Eq. (12)
-    def loss_calculate(self, input, target):
-        assert (input.size() == target.size())
-        assert (target.requires_grad is False)
-        return self.mse_loss(input, target)
-
-    def forward(self, input):
-        #   calculate Eq. (12) and Eq. (13), and return L_c and L_s from Eq. (11)
-        #   your code here ...
+    
+    def forward(self, input):   
         features = self.encode(input)[3]
         inference = self.decode(torch.flatten(features))
         return inference
