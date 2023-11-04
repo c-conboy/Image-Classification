@@ -1,12 +1,17 @@
 import argparse
-import os
-from PIL import Image
+#import os
+#from PIL import Image
 import torch
 import torchvision.transforms as transforms 
 from torchvision.utils import save_image
 import net as net
 from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-frontend_file', type=str, help='frontend weight file')
+parser.add_argument('-cuda', type=str, help='[Y/N]')
 
 
 test_transform = transforms.Compose([transforms.ToTensor()])

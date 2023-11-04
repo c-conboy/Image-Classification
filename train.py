@@ -1,16 +1,35 @@
 
-import math
+#import math
 import torchvision.transforms as transforms 
 from torchvision.utils import save_image
 import net as net
 from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 from torchvision import transforms
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 import torch
 import os
+import argparse
+
+#Argument parsing:
+parser = argparse.ArgumentParser()
+
+# training options
+parser.add_argument('-s', default='./experiments',
+                    help='Directory to save the model')
+parser.add_argument('-l', type=str, default='frontendsaved.pth')
+parser.add_argument('-lr', type=float, default=1e-4)
+parser.add_argument('-e', type=int, default=20)
+parser.add_argument('-b', type=int, default=100)
+
+parser.add_argument('-cuda', type=str, default='N')
+
+parser.add_argument('-p', type=str, default='loss.png')
+args = parser.parse_args()
+
+
 
 epochs = 20
 batchs = 100
