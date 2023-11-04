@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 import torch
 import os
 
-epochs = 2
+epochs = 20
 batchs = 100
 if(0):
     device = torch.device('cuda')
@@ -67,7 +67,7 @@ for i in tqdm(range(epochs)):
         #update epoch loss
         batch_loss = batch_loss/batchs
         print(batch_loss)
-    if(i%10 == 0):
+    if(i%10 == 0 or i == (epochs-1)):
         state_dict = model.frontend.state_dict()
         torch.save(state_dict, 
                    './frontend_iter_{:d}.pth.tar'.format(i + 1))
