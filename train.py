@@ -67,16 +67,15 @@ for i in tqdm(range(epochs)):
         #update epoch loss
         batch_loss = batch_loss/batchs
         print(batch_loss)
-    if(i%1 == 0):
+    if(i%10 == 0):
         state_dict = model.frontend.state_dict()
-        path = "/frontend" + str(i) + ".pth"
-        decoder_state_dict_file = os.path.join(os.getcwd(), path)
+        torch.save(state_dict, 
+                   './frontend_iter_{:d}.pth.tar'.format(i + 1))
     losses_data[i] += batch_loss
-
-
 
 state_dict = model.frontend.state_dict()
 decoder_state_dict_file = os.path.join(os.getcwd(), "/frontend.pth")
+torch.save(state_dict, decoder_state_dict_file)
 
 plt.plot(losses_data.cpu().detach().numpy())
 
