@@ -19,7 +19,6 @@ if(0):
 else:
     device = torch.device('cuda')
 
-device = torch.device(device)
 
 train_transform = transforms.Compose([transforms.ToTensor()])
 train_set = CIFAR10('./data/', train=True, download=True, transform=train_transform)
@@ -27,15 +26,20 @@ train_dataloader = DataLoader(train_set, batch_size=int(batchs), shuffle=True)
 
 encoder = net.encoder_decoder.encoder
 encoder.load_state_dict(torch.load("./encoder.pth", map_location=device))
+#frontend = net.encoder_decoder.frontend
+#frontend.load_state_dict(torch.load("./frontend1.pth", map_location=device))
+#model = net.CJNet(encoder, frontend)
+
 model = net.CJNet(encoder)
 model.train()
-model.to(device=device)
+model.to(device)
 
 optimizer = torch.optim.Adam(model.frontend.parameters(), lr=1e-4)
 loss_fn = torch.nn.CrossEntropyLoss()
 
 #Tensor to hold loss at each epoch
 losses_data = torch.zeros(epochs)
+losses_data = losses_data.to(torch.device('cuda'))
 for i in tqdm(range(epochs)):
     print("epoch:" + str(i))
     k = -1
@@ -46,11 +50,11 @@ for i in tqdm(range(epochs)):
         batch_loss = 0
         for j in range(batchs):
             image = batch[0][j]
-            image = image.to(device=device)
+            image = image.to(device)
             #call forward function
             inference = model(image)
             target = batch[1][j]
-            target = target.to(device=device)
+            target = target.to(device)
             
             #Calculate loss
             cross_entropy_loss = loss_fn(inference, target)
@@ -62,18 +66,19 @@ for i in tqdm(range(epochs)):
         optimizer.step()
         #update epoch loss
         batch_loss = batch_loss/batchs
-        batch_loss.to(device=device)
         print(batch_loss)
+    if(i%1 == 0):
+        state_dict = model.frontend.state_dict()
+        path = "/frontend" + str(i) + ".pth"
+        decoder_state_dict_file = os.path.join(os.getcwd(), path)
     losses_data[i] += batch_loss
-    losses_data.to(device=device)
 
 
 
 state_dict = model.frontend.state_dict()
 decoder_state_dict_file = os.path.join(os.getcwd(), "/frontend.pth")
 
-
-plt.plot(losses_data.detach().numpy())
+plt.plot(losses_data.cpu().detach().numpy())
 
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
