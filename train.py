@@ -24,19 +24,18 @@ parser.add_argument('-lr', type=float, default=1e-4)
 parser.add_argument('-e', type=int, default=20)
 parser.add_argument('-b', type=int, default=100)
 
-parser.add_argument('-cuda', type=str, default='N')
+parser.add_argument('-cuda', type=str, default='Y')
 
 parser.add_argument('-p', type=str, default='loss.png')
 args = parser.parse_args()
 
 
-
-epochs = 20
-batchs = 100
-if(0):
+epochs = args.e
+batchs = args.b
+if(args.cuda=='Y'):
     device = torch.device('cuda')
 else:
-    device = torch.device('cuda')
+    device = torch.device('cpu')
 
 
 train_transform = transforms.Compose([transforms.ToTensor()])
@@ -58,7 +57,7 @@ loss_fn = torch.nn.CrossEntropyLoss()
 
 #Tensor to hold loss at each epoch
 losses_data = torch.zeros(epochs)
-losses_data = losses_data.to(torch.device('cuda'))
+losses_data = losses_data.to(torch.device(device))
 for i in tqdm(range(epochs)):
     print("epoch:" + str(i))
     k = -1
