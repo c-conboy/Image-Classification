@@ -1,0 +1,1 @@
+python test.py -frontend_file frontend.pth -cuda Y
