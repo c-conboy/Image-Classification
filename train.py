@@ -3,7 +3,7 @@
 import torchvision.transforms as transforms 
 from torchvision.utils import save_image
 import net as net
-from torchvision.datasets import CIFAR10
+from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
 #from tensorboardX import SummaryWriter
 from torchvision import transforms
@@ -19,14 +19,14 @@ parser = argparse.ArgumentParser()
 # training options
 parser.add_argument('-s', default='./experiments',
                     help='Directory to save the model')
-parser.add_argument('-l', type=str, default='frontendsaved.pth')
-parser.add_argument('-lr', type=float, default=1e-4)
-parser.add_argument('-e', type=int, default=20)
-parser.add_argument('-b', type=int, default=100)
+parser.add_argument('-l', type=str, default='./frontendsaved100.pth')
+parser.add_argument('-lr', type=float, default=1e-5)
+parser.add_argument('-e', type=int, default=50)
+parser.add_argument('-b', type=int, default=1000)
 
 parser.add_argument('-cuda', type=str, default='Y')
 
-parser.add_argument('-p', type=str, default='loss.png')
+parser.add_argument('-p', type=str, default='loss100.png')
 args = parser.parse_args()
 
 
@@ -39,7 +39,7 @@ else:
 
 
 train_transform = transforms.Compose([transforms.ToTensor()])
-train_set = CIFAR10('./data/', train=True, download=True, transform=train_transform)
+train_set = CIFAR100('./data/', train=True, download=True, transform=train_transform)
 train_dataloader = DataLoader(train_set, batch_size=int(batchs), shuffle=True)
 
 encoder = net.encoder_decoder.encoder
@@ -52,7 +52,7 @@ model = net.CJNet(encoder)
 model.train()
 model.to(device)
 
-optimizer = torch.optim.Adam(model.frontend.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(model.frontend.parameters(), lr=args.lr)
 loss_fn = torch.nn.CrossEntropyLoss()
 
 #Tensor to hold loss at each epoch
@@ -86,17 +86,13 @@ for i in tqdm(range(epochs)):
         batch_loss = batch_loss/batchs
         print(batch_loss)
     if(i%10 == 0 or i == (epochs-1)):
-        state_dict = model.frontend.state_dict()
-        torch.save(state_dict, 
-                   './frontend_iter_{:d}.pth.tar'.format(i + 1))
+        torch.save(model.frontend.state_dict(), './frontend100_iter_{:d}.pth'.format(i + 1))
     losses_data[i] += batch_loss
 
-state_dict = model.frontend.state_dict()
-decoder_state_dict_file = os.path.join(os.getcwd(), "/frontend.pth")
-torch.save(state_dict, decoder_state_dict_file)
 
+torch.save(model.frontend.state_dict(), args.l)
 plt.plot(losses_data.cpu().detach().numpy())
 
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.savefig("./loss.png")
+plt.savefig("./loss100.png")
