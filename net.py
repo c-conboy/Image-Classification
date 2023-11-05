@@ -45,10 +45,13 @@ class encoder_decoder:
 
     frontend = nn.Sequential(
         nn.Linear(8192, 4096),
+        nn.Dropout(0.3),
+        nn.BatchNorm1d(4096),
         nn.Linear(4096, 100),
+        nn.Dropout(0.3),
+        nn.BatchNorm1d(100),
         nn.Softmax(),
     )
-
 class CJNet(nn.Module):
 
     def __init__(self, encoder, frontend=None):
