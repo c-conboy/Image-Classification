@@ -55,9 +55,10 @@ model.to(device)
 optimizer = torch.optim.Adam(model.frontend.parameters(), lr=args.lr)
 loss_fn = torch.nn.CrossEntropyLoss()
 
+"""
 #Tensor to hold loss at each epoch
 losses_data = torch.zeros(epochs)
-losses_data = losses_data.to(torch.device(device))
+losses_data = losses_data.to(device)
 for i in tqdm(range(epochs)):
     print("epoch:" + str(i))
     k = -1
@@ -85,14 +86,48 @@ for i in tqdm(range(epochs)):
         #update epoch loss
         batch_loss = batch_loss/batchs
         print(batch_loss)
-    if(i%10 == 0 or i == (epochs-1)):
-        torch.save(model.frontend.state_dict(), './frontend100_iter_{:d}.pth'.format(i + 1))
+    if(i%10 == 0):
+        state_dict = model.frontend.state_dict()
+        torch.save(state_dict, 
+                   './frontend_iter_{:d}.pth'.format(i + 1))
     losses_data[i] += batch_loss
+"""
 
+#Tensor to hold loss at each epoch
+losses_data = torch.zeros(epochs)
+losses_data = losses_data.to(torch.device(device))
+for i in tqdm(range(epochs)):
+    print("epoch:" + str(i))
+    k = -1
+    epoch_loss = 0
+    for batch in train_dataloader:
+        #start recording loss
+        k+=1
+        print('i, batchNumber', i, k)
+        for j in range(batchs):
+            image = batch[0]
+            image = image.to(device)
+            #call forward function
+            inference = model(image)
+            target = batch[1]
+            target = target.to(device)
+            
+            #Calculate loss
+            cross_entropy_loss = loss_fn(inference, target)
+            epoch_loss += cross_entropy_loss
+        #update model parameters based on loss
+        optimizer.zero_grad()
+        cross_entropy_loss.backward()
+        optimizer.step()
+        print(cross_entropy_loss)
+    losses_data[i] += epoch_loss
 
-torch.save(model.frontend.state_dict(), args.l)
+state_dict = model.frontend.state_dict()
+decoder_state_dict_file = os.path.join(os.getcwd(), "/frontend.pth")
+torch.save(state_dict, decoder_state_dict_file)
+
 plt.plot(losses_data.cpu().detach().numpy())
-
+str
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.savefig("./loss100.png")
+plt.savefig("./loss.png")

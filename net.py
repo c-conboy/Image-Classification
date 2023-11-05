@@ -96,6 +96,7 @@ class CJNet(nn.Module):
     
     def forward(self, input):   
         features = self.encode(input)[3]
-        inference = self.decode(torch.flatten(features))
+        features = torch.flatten(features, 1, 3)
+        inference = self.decode(features)
         return inference
        
