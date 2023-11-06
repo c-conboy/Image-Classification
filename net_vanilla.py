@@ -46,7 +46,7 @@ class encoder_decoder:
     frontend = nn.Sequential(
         nn.Linear(8192, 4096),
         nn.Linear(4096, 100),
-        nn.Softmax(),
+        nn.Softmax(1),
     )
 class CJNet(nn.Module):
 

@@ -2,7 +2,7 @@
 #import math
 import torchvision.transforms as transforms 
 from torchvision.utils import save_image
-import train_vanilla as net
+import net_vanilla as net
 from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
 #from tensorboardX import SummaryWriter
@@ -17,8 +17,6 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # training options
-parser.add_argument('-s', default='./experiments',
-                    help='Directory to save the model')
 parser.add_argument('-l', type=str, default='./frontendsaved100.pth')
 parser.add_argument('-lr', type=float, default=1e-5)
 parser.add_argument('-e', type=int, default=50)
@@ -92,11 +90,10 @@ for i in tqdm(range(epochs)):
     losses_data[i] += batch_loss
 
 state_dict = model.frontend.state_dict()
-decoder_state_dict_file = os.path.join(os.getcwd(), "/frontend.pth")
-torch.save(state_dict, decoder_state_dict_file)
+torch.save(state_dict, args.l)
 
 plt.plot(losses_data.cpu().detach().numpy())
 str
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.savefig("./loss.png")
+plt.savefig(args.p)
