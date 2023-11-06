@@ -5,7 +5,7 @@ import torch
 import torchvision.transforms as transforms 
 from torchvision.utils import save_image
 import net as net
-from torchvision.datasets import CIFAR10
+from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
 
 parser = argparse.ArgumentParser()
@@ -15,7 +15,7 @@ parser.add_argument('-cuda', type=str, help='[Y/N]')
 
 
 test_transform = transforms.Compose([transforms.ToTensor()])
-test_set = CIFAR10('./data/', train=False, download=True, transform=test_transform)
+test_set = CIFAR100('./data/', train=False, download=True, transform=test_transform)
 test_dataloader = DataLoader(test_set, batch_size=int(4), shuffle=True)
 
 frontend = net.encoder_decoder.frontend
