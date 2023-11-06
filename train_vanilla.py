@@ -17,14 +17,14 @@ import argparse
 parser = argparse.ArgumentParser()
 
 # training options
-parser.add_argument('-l', type=str, default='./frontendsaved100.pth')
+parser.add_argument('-l', type=str, default='./frontendtrainvanillanew.pth')
 parser.add_argument('-lr', type=float, default=1e-5)
 parser.add_argument('-e', type=int, default=50)
 parser.add_argument('-b', type=int, default=1000)
 
 parser.add_argument('-cuda', type=str, default='Y')
 
-parser.add_argument('-p', type=str, default='loss100.png')
+parser.add_argument('-p', type=str, default='losstrainvanillanew.png')
 args = parser.parse_args()
 
 
@@ -86,7 +86,7 @@ for i in tqdm(range(epochs)):
     if(i%10 == 0):
         state_dict = model.frontend.state_dict()
         torch.save(state_dict, 
-                   './frontend_iter_{:d}.pth'.format(i + 1))
+                   './frontendtrainvanillanew_iter_{:d}.pth'.format(i + 1))
     losses_data[i] += batch_loss
 
 state_dict = model.frontend.state_dict()
