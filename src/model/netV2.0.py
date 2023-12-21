@@ -50,7 +50,7 @@ class encoder_decoder:
         nn.Linear(4096, 100),
         nn.Dropout(0.3),
         nn.BatchNorm1d(100),
-        nn.Softmax(),
+        nn.Softmax(1),
     )
 class CJNet(nn.Module):
 
