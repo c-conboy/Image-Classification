@@ -4,9 +4,10 @@
 #   Adapted from:
 #       https://github.com/naoto0804/pytorch-AdaIN
 #
-import torch.nn.functional as F #introduce activation functions
+import torch.nn.functional as F  # introduce activation functions
 import torch.nn as nn
 import torch
+
 
 class encoder_decoder:
     encoder = nn.Sequential(
@@ -45,13 +46,11 @@ class encoder_decoder:
 
     frontend = nn.Sequential(
         nn.Linear(8192, 4096),
-        nn.Dropout(0.3),
-        nn.BatchNorm1d(4096),
         nn.Linear(4096, 100),
-        nn.Dropout(0.3),
-        nn.BatchNorm1d(100),
         nn.Softmax(1),
     )
+
+
 class CJNet(nn.Module):
 
     def __init__(self, encoder, frontend=None):
@@ -66,10 +65,14 @@ class CJNet(nn.Module):
         # need access to these intermediate encoder steps
         # for the AdaIN computation
         encoder_list = list(encoder.children())
-        self.encoder_stage_1 = nn.Sequential(*encoder_list[:4])  # input -> relu1_1
-        self.encoder_stage_2 = nn.Sequential(*encoder_list[4:11])  # relu1_1 -> relu2_1
-        self.encoder_stage_3 = nn.Sequential(*encoder_list[11:18])  # relu2_1 -> relu3_1
-        self.encoder_stage_4 = nn.Sequential(*encoder_list[18:31])  # relu3_1 -> relu4_1
+        self.encoder_stage_1 = nn.Sequential(
+            *encoder_list[:4])  # input -> relu1_1
+        self.encoder_stage_2 = nn.Sequential(
+            *encoder_list[4:11])  # relu1_1 -> relu2_1
+        self.encoder_stage_3 = nn.Sequential(
+            *encoder_list[11:18])  # relu2_1 -> relu3_1
+        self.encoder_stage_4 = nn.Sequential(
+            *encoder_list[18:31])  # relu3_1 -> relu4_1
 
         #   if no decoder loaded, then initialize with random weights
         if self.frontend == None:
@@ -90,13 +93,12 @@ class CJNet(nn.Module):
         relu3_1 = self.encoder_stage_3(relu2_1)
         relu4_1 = self.encoder_stage_4(relu3_1)
         return relu1_1, relu2_1, relu3_1, relu4_1
-    
+
     def decode(self, X):
         return self.front_end_stages(X)
-    
-    def forward(self, input):   
+
+    def forward(self, input):
         features = self.encode(input)[3]
-        features = torch.flatten(features, 1, 3)
+        features = torch.flatten(features)
         inference = self.decode(features)
         return inference
-       

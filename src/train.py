@@ -1,11 +1,11 @@
 
-#import math
-import torchvision.transforms as transforms 
+# import math
+import torchvision.transforms as transforms
 from torchvision.utils import save_image
 import net as net
 from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
-#from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 from torchvision import transforms
 from tqdm import tqdm
 from matplotlib import pyplot as plt
@@ -13,7 +13,7 @@ import torch
 import os
 import argparse
 
-#Argument parsing:
+# Argument parsing:
 parser = argparse.ArgumentParser()
 
 # training options
@@ -32,21 +32,22 @@ args = parser.parse_args()
 
 epochs = args.e
 batchs = args.b
-if(args.cuda=='Y'):
+if (args.cuda == 'Y'):
     device = torch.device('cuda')
 else:
     device = torch.device('cpu')
 
 
 train_transform = transforms.Compose([transforms.ToTensor()])
-train_set = CIFAR100('./data/', train=True, download=True, transform=train_transform)
+train_set = CIFAR100('./data/', train=True, download=True,
+                     transform=train_transform)
 train_dataloader = DataLoader(train_set, batch_size=int(batchs), shuffle=True)
 
 encoder = net.encoder_decoder.encoder
 encoder.load_state_dict(torch.load("./encoder.pth", map_location=device))
-#frontend = net.encoder_decoder.frontend
-#frontend.load_state_dict(torch.load("./frontend1.pth", map_location=device))
-#model = net.CJNet(encoder, frontend)
+# frontend = net.encoder_decoder.frontend
+# frontend.load_state_dict(torch.load("./frontend1.pth", map_location=device))
+# model = net.CJNet(encoder, frontend)
 
 model = net.CJNet(encoder)
 model.train()
@@ -93,7 +94,7 @@ for i in tqdm(range(epochs)):
     losses_data[i] += batch_loss
 """
 
-#Tensor to hold loss at each epoch
+# Tensor to hold loss at each epoch
 losses_data = torch.zeros(epochs)
 losses_data = losses_data.to(torch.device(device))
 for i in tqdm(range(epochs)):
@@ -101,21 +102,21 @@ for i in tqdm(range(epochs)):
     k = -1
     epoch_loss = 0
     for batch in train_dataloader:
-        #start recording loss
-        k+=1
+        # start recording loss
+        k += 1
         print('i, batchNumber', i, k)
         for j in range(batchs):
             image = batch[0]
             image = image.to(device)
-            #call forward function
+            # call forward function
             inference = model(image)
             target = batch[1]
             target = target.to(device)
-            
-            #Calculate loss
+
+            # Calculate loss
             cross_entropy_loss = loss_fn(inference, target)
             epoch_loss += cross_entropy_loss
-        #update model parameters based on loss
+        # update model parameters based on loss
         optimizer.zero_grad()
         cross_entropy_loss.backward()
         optimizer.step()

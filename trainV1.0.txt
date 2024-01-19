@@ -1,1 +1,0 @@
-python train_mod.py -e 20 -b 100 -l frontendSave.pth -p loss.png -cuda Y
